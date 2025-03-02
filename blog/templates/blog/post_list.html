@@ -32,11 +32,31 @@
         .post p {
             color: #555;
         }
+        .new-post-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .new-post-btn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Blog Posts</h1>
+
+         <!-- New Post Button -->
+         <a href="{% url 'create_post' %}" class="new-post-btn">+ New Blog Post</a>
+
+
         {% for post in posts %}
             <div class="post">
                 <h2>{{ post.title }}</h2>
