@@ -51,6 +51,17 @@
 </head>
 <body>
     <div class="container">
+
+        <div style="text-align: right;">
+            {% if user.is_authenticated %}
+                <span>Welcome, {{ user.username }}!</span>
+                <a href="{% url 'logout' %}" class="new-post-btn">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="new-post-btn">Login</a>
+                <a href="{% url 'register' %}" class="new-post-btn">Register</a>
+            {% endif %}
+        </div>
+
         <h1>Blog Posts</h1>
 
          <!-- New Post Button -->
