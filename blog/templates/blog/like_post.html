@@ -1,0 +1,32 @@
+<p><strong>Likes:</strong> <span id="like-count">{{ post.total_likes }}</span></p>
+
+{% if user.is_authenticated %}
+    <button id="like-btn" data-post-id="{{ post.id }}">
+        {% if user in post.likes.all %}
+            Unlike
+        {% else %}
+            Like
+        {% endif %}
+    </button>
+{% else %}
+    <p><a href="{% url 'login' %}">Log in</a> to like this post.</p>
+{% endif %}
+
+<script>
+document.getElementById('like-btn').addEventListener('click', function() {
+    let postId = this.getAttribute('data-post-id');
+    
+    fetch(`/post/${postId}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('like-count').innerText = data.total_likes;
+        this.innerText = data.liked ? "Unlike" : "Like";
+    });
+});
+</script>

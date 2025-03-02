@@ -1,10 +1,13 @@
-from django.shortcuts import render, redirect
-from .models import Post
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Post, Comment
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from .forms import CommentForm
 
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import PostForm, RegisterForm
+
+from django.http import JsonResponse
 
 # View function to display all blog posts
 
@@ -55,3 +58,33 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('post_list')  # Redirect to home page after logout
+
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    comments = post.comments.all()  # Get all comments for the post
+    form = CommentForm()
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect('post_detail', post_id=post.id)
+
+    return render(request, 'blog/post_detail.html', {'post': post, 'comments': comments, 'form': form})
+
+
+@login_required
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)  # Unlike
+        liked = False
+    else:
+        post.likes.add(request.user)  # Like
+        liked = True
+
+    return JsonResponse({'liked': liked, 'total_likes': post.total_likes()})
